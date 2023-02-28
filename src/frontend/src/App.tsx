@@ -10,9 +10,11 @@ import {
   TeamOutlined,
   UserOutlined,
   LoadingOutlined,
+  PlusOutlined
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Layout, Menu, Table, Spin, Empty, theme } from "antd";
+import { Breadcrumb, Layout, Menu, Table, Spin, Empty, theme, Button } from "antd";
+import StudentDrawerForm from "./StudentDrawerForm.tsx";
 const { Header, Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -74,13 +76,14 @@ function App() {
   const [students, setStudents] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [showDrawer, setShowDrawer] = useState(false);
+
 
   const studentApi = new StudentApi();
   const fetchStudents = () =>
     studentApi.getAllStudents().then((data) => {
       setStudents(data);
       setFetching(false);
-      console.log(data);
     });
 
   const {
@@ -89,9 +92,10 @@ function App() {
 
   // I want to run getAllStudents() only when the component loads => useEffect
   useEffect(() => {
-    console.log("component is mounted");
-    fetchStudents();
-  }, [fetchStudents]);
+    (async () => {
+      await fetchStudents();
+    })();
+  }, []);
 
   const renderStudents = () => {
     if (fetching) {
@@ -100,17 +104,21 @@ function App() {
     if (students.length <= 0) {
       return <Empty />;
     }
-    return (
+    return <>
+      <StudentDrawerForm showDrawer={showDrawer} setShowDrawer={setShowDrawer}/>
       <Table
         dataSource={students}
         columns={columns}
         bordered
-        title={() => "Students"}
+        title={() => 
+          <Button onClick={() => {setShowDrawer(!showDrawer);}} type="primary" shape="round" icon={<PlusOutlined />} size="middle">
+            Add a new student
+          </Button>}
         pagination={{ pageSize: 50 }}
         scroll={{ y: 350 }}
         rowKey={(student) => student.id}
       />
-    );
+    </>
   };
 
   return (
