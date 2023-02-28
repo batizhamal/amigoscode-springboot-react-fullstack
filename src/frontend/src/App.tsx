@@ -91,7 +91,7 @@ function App() {
   useEffect(() => {
     console.log("component is mounted");
     fetchStudents();
-  }, []);
+  }, [fetchStudents]);
 
   const renderStudents = () => {
     if (fetching) {
@@ -107,7 +107,7 @@ function App() {
         bordered
         title={() => "Students"}
         pagination={{ pageSize: 50 }}
-        scroll={{ y: 240 }}
+        scroll={{ y: 350 }}
         rowKey={(student) => student.id}
       />
     );
