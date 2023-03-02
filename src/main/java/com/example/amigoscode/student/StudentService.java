@@ -19,4 +19,8 @@ public class StudentService {
         // check if email is taken
         studentRepository.save(student);
     }
+
+    public void deleteStudet(Long id) {
+        studentRepository.deleteById(id);
+    }
 }

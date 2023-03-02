@@ -12,4 +12,8 @@ export class StudentApi extends API {
       },
     });
   }
+
+  deleteStudent(id: number) {
+    return this.delete(`api/v1/students/${id}`);
+  }
 }

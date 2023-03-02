@@ -12,7 +12,11 @@ class API {
   get<T>(url: string, config?: AxiosRequestConfig) {
     return this.instance()
       .get<T>(url, config)
-      .then((response) => response.data);
+      .then((response) => {
+        return response.data;
+      }).catch(error => {
+        throw error.response;
+      });
   }
 
   post<T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) {

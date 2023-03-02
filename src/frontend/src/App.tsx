@@ -12,9 +12,10 @@ import {
   LoadingOutlined,
   PlusOutlined
 } from "@ant-design/icons";
-import type { MenuProps } from "antd";
-import { Breadcrumb, Layout, Menu, Table, Spin, Empty, theme, Button } from "antd";
+import { Avatar, Badge, MenuProps, Popconfirm } from "antd";
+import { Breadcrumb, Layout, Menu, Table, Spin, Empty, theme, Button, Radio } from "antd";
 import StudentDrawerForm from "./StudentDrawerForm.tsx";
+import { openNotificationWithIcon } from "./Notification.ts";
 const { Header, Content, Footer, Sider } = Layout;
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -47,28 +48,75 @@ const items: MenuItem[] = [
   getItem("Files", "9", <FileOutlined />),
 ];
 
-const columns = [
-  {
-    title: "ID",
-    dataIndex: "id",
-    key: "id",
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Email",
-    dataIndex: "email",
-    key: "email",
-  },
-  {
-    title: "Gender",
-    dataIndex: "gender",
-    key: "gender",
-  },
-];
+const TheAvatar = ({name}) => {
+  if (name.trim().length === 0) {
+    return <Avatar icon={<UserOutlined/>}/>
+  }
+  const split = name.trim().split(' ');
+  if (split.length === 1) {
+    return <Avatar>{name.charAt(0)}</Avatar>
+  }
+  return <Avatar>`${name.charAt(0)}${name.charAt(name.length-1)}`</Avatar>
+}
+
+const columns = (fetchStudents) => {
+  return [
+    {
+      title: '',
+      dataIndex: 'avatar',
+      key: 'avatar',
+      render: (text, student) => <TheAvatar name={student.name}/>
+    },
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
+    },
+    {
+      title: "Actions",
+      dataIndex: "actions",
+      key: "actions",
+      render: (text, student) => <>
+        <Radio.Group>
+          <Popconfirm
+            placement="topRight"
+            title={"Delete student"}
+            description={`Are you sure you want to delete student with ID ${student.id}?`}
+            onConfirm={() => {deleteStudent(student.id, fetchStudents)}}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Radio.Button>Delete</Radio.Button>
+          </Popconfirm>
+          <Radio.Button>Edit</Radio.Button>
+        </Radio.Group>
+      </>,
+    },
+  ];
+} 
+
+const deleteStudent = (id: number, callback) => {
+  const studentApi = new StudentApi();
+  studentApi.deleteStudent(id).then(() => {
+    openNotificationWithIcon('success', 'Student successfully deleted', `Student with an ID ${id} was deleted`);
+    callback();
+  });
+}
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -83,6 +131,10 @@ function App() {
   const fetchStudents = () =>
     studentApi.getAllStudents().then((data) => {
       setStudents(data);
+    }).catch((error) => {
+      console.log(error.data.message);
+      openNotificationWithIcon('error', 'There was a problem', error.data.message);
+    }).finally(() => {
       setFetching(false);
     });
 
@@ -105,16 +157,28 @@ function App() {
       return <Empty />;
     }
     return <>
-      <StudentDrawerForm showDrawer={showDrawer} setShowDrawer={setShowDrawer}/>
+      <StudentDrawerForm 
+          showDrawer={showDrawer} 
+          setShowDrawer={setShowDrawer}
+          fetchStudents={fetchStudents}
+      />
       <Table
         dataSource={students}
-        columns={columns}
+        columns={columns(fetchStudents)}
         bordered
         title={() => 
-          <Button onClick={() => {setShowDrawer(!showDrawer);}} type="primary" shape="round" icon={<PlusOutlined />} size="middle">
-            Add a new student
-          </Button>}
-        pagination={{ pageSize: 50 }}
+          <>
+            <Button onClick={() => {setShowDrawer(!showDrawer);}} type="primary" shape="round" icon={<PlusOutlined />} size="middle">
+              Add a new student
+            </Button>
+            <Badge
+              className="site-badge-count-109"
+              count={students.length}
+              style={{ backgroundColor: '#52c41a' }}
+            />
+          </>
+          }
+        pagination={{ pageSize: 5 }}
         scroll={{ y: 350 }}
         rowKey={(student) => student.id}
       />

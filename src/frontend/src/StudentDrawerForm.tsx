@@ -1,16 +1,35 @@
-import {Drawer, Input, Col, Select, Form, Row, Button} from 'antd';
-import React from 'react';
+import {Drawer, Input, Col, Select, Form, Row, Button, Spin} from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
 import { StudentApi } from './api/studentApi.ts';
+import { openNotificationWithIcon } from './Notification.ts';
 
 const {Option} = Select;
 
-function StudentDrawerForm({showDrawer, setShowDrawer}) {
+function StudentDrawerForm({showDrawer, setShowDrawer, fetchStudents}) {
     const studenApi = new StudentApi();
+    const [submitting, setSubmitting] = useState(false);
+    const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
     const onCLose = () => setShowDrawer(false);
 
     const onFinish = student => {
-        studenApi.addNewStudent(student).then(()=> {console.log('student added');}).catch(error => {console.log(error);});
+        setSubmitting(true);
+        studenApi.addNewStudent(student)
+            .then(()=> {
+                console.log('student added');
+                onCLose();
+                fetchStudents();
+                openNotificationWithIcon(
+                    'success', 
+                    'Student successfully added',
+                    `${student.name} was added to the system.`
+                );
+            })
+            .catch(error => {console.log(error);})
+            .finally(() => {
+                setSubmitting(false);
+            });
     };
 
     const onFinishFailed = errorInfo => {
@@ -82,6 +101,9 @@ function StudentDrawerForm({showDrawer, setShowDrawer}) {
                         </Button>
                     </Form.Item>
                 </Col>
+            </Row>
+            <Row>
+                {submitting && <Spin indicator={antIcon} />}
             </Row>
         </Form>
     </Drawer>
