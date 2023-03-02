@@ -26,7 +26,9 @@ function StudentDrawerForm({showDrawer, setShowDrawer, fetchStudents}) {
                     `${student.name} was added to the system.`
                 );
             })
-            .catch(error => {console.log(error);})
+            .catch(error => {
+                openNotificationWithIcon('error', 'There was a problem', error.data.message);
+            })
             .finally(() => {
                 setSubmitting(false);
             });

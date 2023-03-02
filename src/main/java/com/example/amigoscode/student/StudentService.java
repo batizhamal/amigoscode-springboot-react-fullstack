@@ -16,11 +16,16 @@ public class StudentService {
     }
 
     public void addStudent(Student student) {
-        // check if email is taken
+        if (studentRepository.selectExistsEmail(student.getEmail())) {
+            throw new IllegalStateException("The email is already taken");
+        }
         studentRepository.save(student);
     }
 
     public void deleteStudet(Long id) {
+        if (studentRepository.findById(id).isEmpty()) {
+            throw new IllegalStateException("The student with id " + id + " does not exist.");
+        }
         studentRepository.deleteById(id);
     }
 }

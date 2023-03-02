@@ -22,19 +22,28 @@ class API {
   post<T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) {
     return this.instance()
       .post<T>(url, data, config)
-      .then((response) => response.data);
+      .then((response) => response.data)
+      .catch(error => {
+        throw error.response;
+      });
   }
 
   delete<T>(url: string, config?: AxiosRequestConfig) {
     return this.instance()
       .delete<T>(url, config)
-      .then((response) => response.data);
+      .then((response) => response.data)
+      .catch(error => {
+        throw error.response;
+      });
   }
 
   put<T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) {
     return this.instance()
       .put<T>(url, data, config)
-      .then((response) => response.data);
+      .then((response) => response.data)
+      .catch(error => {
+        throw error.response;
+      });
   }
 }
 

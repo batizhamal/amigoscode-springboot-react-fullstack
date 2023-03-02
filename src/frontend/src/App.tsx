@@ -115,7 +115,9 @@ const deleteStudent = (id: number, callback) => {
   studentApi.deleteStudent(id).then(() => {
     openNotificationWithIcon('success', 'Student successfully deleted', `Student with an ID ${id} was deleted`);
     callback();
-  });
+  }).catch(error => {
+    openNotificationWithIcon('error', 'There was a problem', error.data.message);
+  });;
 }
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
