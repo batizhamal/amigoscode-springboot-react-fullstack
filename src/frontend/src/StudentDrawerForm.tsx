@@ -27,7 +27,7 @@ function StudentDrawerForm({showDrawer, setShowDrawer, fetchStudents}) {
                 );
             })
             .catch(error => {
-                openNotificationWithIcon('error', 'There was a problem', error.data.message);
+                openNotificationWithIcon('error', 'There was a problem', error.data.message, "bottomLeft");
             })
             .finally(() => {
                 setSubmitting(false);
