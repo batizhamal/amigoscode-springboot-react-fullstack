@@ -237,7 +237,7 @@ function App() {
             {renderStudents()}
           </div>
         </Content>
-        <Footer style={{ textAlign: "center" }}>This is a footer</Footer>
+        <Footer style={{ textAlign: "center" }}>This is a new footer to learn automated deployment</Footer>
       </Layout>
     </Layout>
   );
